@@ -5,7 +5,7 @@ A comprehensive penetration testing companion designed for Raspberry Pi Zero 2 W
 ## Hardware Requirements
 
 - Raspberry Pi Zero 2 W
-- Waveshare 1.44-inch 128x128 Display HAT (with joystick and 3 buttons)
+- Waveshare 1.44-inch 128x128 TFT Display HAT
 - 32 GB memory card
 - WiFi connectivity
 
