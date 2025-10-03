@@ -1,0 +1,15 @@
+[Unit]
+Description=Pen-Deck Cybersecurity Companion
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/pen-deck
+Environment=PATH=/home/pi/pen-deck/pen-deck-env/bin
+ExecStart=/home/pi/pen-deck/pen-deck-env/bin/python main.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,99 @@
+{
+  "wifi_networks": [
+    {
+      "ssid": "pen-deck",
+      "password": "1234567890",
+      "priority": 2
+    },
+    {
+      "ssid": "TP-Link_A2C2",
+      "password": "Dhiraj$2007",
+      "priority": 1
+    }
+  ],
+  "ai_assistant": {
+    "api_key": "Your Open-AI API key here",
+    "model": "gpt-3.5-turbo",
+    "max_tokens": 500,
+    "temperature": 0.7,
+    "provider": "openai"
+  },
+  "tools": {
+    "nmap": {
+      "quick_scan": "nmap -T4 -F {target}",
+      "aggressive_scan": "nmap -A -T4 {target}",
+      "version_scan": "nmap -sV {target}",
+      "stealth_scan": "nmap -sS -T2 {target}",
+      "port_scan": "nmap -p- {target}",
+      "os_detection": "nmap -O {target}"
+    },
+    "nikto": {
+      "basic_scan": "nikto -h {target}",
+      "ssl_scan": "nikto -h {target} -ssl",
+      "full_scan": "nikto -h {target} -Tuning 123456789"
+    },
+    "bettercap": {
+      "network_discovery": "bettercap -eval 'net.probe on; net.show'",
+      "arp_spoof": "bettercap -T {target}",
+      "sniff": "bettercap -eval 'net.sniff on'"
+    },
+    "aircrack": {
+      "monitor_mode": "airmon-ng start wlan0",
+      "capture": "airodump-ng wlan0mon",
+      "stop_monitor": "airmon-ng stop wlan0mon"
+    },
+    "netcat": {
+      "listen": "nc -lvp {port}",
+      "connect": "nc {target} {port}",
+      "banner_grab": "nc -v {target} {port}"
+    },
+    "dig": {
+      "lookup": "dig {target}",
+      "mx_records": "dig {target} MX",
+      "ns_records": "dig {target} NS"
+    }
+  },
+  "display": {
+    "brightness": 128,
+    "contrast": 128,
+    "scroll_speed": 2,
+    "font_sizes": {
+      "small": 16,
+      "medium": 18,
+      "large": 26
+    },
+    "theme": "dark",
+    "auto_brightness": false
+  },
+  "system": {
+    "log_level": "INFO",
+    "auto_save_results": true,
+    "web_ui_port": 8080,
+    "enable_web_ui": true,
+    "auto_connect_wifi": true,
+    "results_directory": "results",
+    "max_results_files": 100,
+    "auto_cleanup_days": 30,
+    "enable_logging": true,
+    "log_directory": "logs",
+    "timezone": "UTC"
+  },
+  "security": {
+    "web_ui_username": "admin",
+    "web_ui_password": "admin",
+    "enable_authentication": false,
+    "allowed_ips": [],
+    "rate_limiting": true
+  },
+  "notifications": {
+    "enable_scan_complete": true,
+    "enable_error_alerts": true,
+    "sound_enabled": false
+  },
+  "advanced": {
+    "max_concurrent_scans": 1,
+    "scan_timeout_seconds": 300,
+    "buffer_size": 4096,
+    "retry_attempts": 3
+  }
+}

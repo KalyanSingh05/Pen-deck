@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pen-Deck Control Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            margin-top: 0.5rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card h2 {
+            color: #2c3e50;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .card-icon {
+            width: 24px;
+            height: 24px;
+            background: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+        
+        .btn-danger:hover {
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(45deg, #27ae60, #229954);
+        }
+        
+        .btn-success:hover {
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .status-connected {
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+        
+        .status-disconnected {
+            background: #fadbd8;
+            color: #e74c3c;
+        }
+        
+        .results-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        .result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid #ecf0f1;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        .result-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .system-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background: #d5f4e6;
+            color: #27ae60;
+            border: 1px solid #a9dfbf;
+        }
+        
+        .alert-error {
+            background: #fadbd8;
+            color: #e74c3c;
+            border: 1px solid #f1948a;
+        }
+        
+        .network-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            border: 1px solid #ecf0f1;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .signal-strength {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .signal-excellent { background: #d5f4e6; color: #27ae60; }
+        .signal-good { background: #fcf3cf; color: #f39c12; }
+        .signal-poor { background: #fadbd8; color: #e74c3c; }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .system-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔒 Pen-Deck Control Panel</h1>
+        <p>Cybersecurity Companion - Remote Configuration & Management</p>
+    </div>
+    
+    <div class="container">
+        <div class="dashboard">
+            <!-- System Status -->
+            <div class="card">
+                <h2><div class="card-icon">📊</div>System Status</h2>
+                <div id="system-status">
+                    <div class="status status-disconnected">Loading...</div>
+                    <div id="system-info" class="system-info">
+                        <!-- System info will be loaded here -->
+                    </div>
+                </div>
+                <button class="btn btn-danger" onclick="shutdownSystem()">🔌 Shutdown System</button>
+            </div>
+            
+            <!-- WiFi Networks -->
+            <div class="card">
+                <h2><div class="card-icon">📶</div>WiFi Networks</h2>
+                <div id="wifi-status"></div>
+                <div id="wifi-networks"></div>
+                <button class="btn" onclick="scanWiFi()">🔍 Scan Networks</button>
+                <button class="btn btn-success" onclick="showAddNetworkForm()">➕ Add Network</button>
+                
+                <div id="add-network-form" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ecf0f1;">
+                    <div class="form-group">
+                        <label>Network SSID:</label>
+                        <input type="text" id="new-ssid" placeholder="Enter WiFi network name">
+                    </div>
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input type="password" id="new-password" placeholder="Enter password">
+                    </div>
+                    <button class="btn btn-success" onclick="addNetwork()">💾 Save Network</button>
+                    <button class="btn" onclick="hideAddNetworkForm()">❌ Cancel</button>
+                </div>
+            </div>
+            
+            <!-- AI Assistant -->
+            <div class="card">
+                <h2><div class="card-icon">🤖</div>AI Assistant</h2>
+                <div class="form-group">
+                    <label>API Key:</label>
+                    <input type="password" id="ai-api-key" placeholder="Enter OpenAI API key">
+                </div>
+                <div class="form-group">
+                    <label>Model:</label>
+                    <select id="ai-model">
+                        <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                        <option value="gpt-4">GPT-4</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Max Tokens:</label>
+                    <input type="number" id="ai-max-tokens" value="500" min="50" max="2000">
+                </div>
+                <button class="btn btn-success" onclick="saveAIConfig()">💾 Save AI Config</button>
+            </div>
+            
+            <!-- Pentest Tools -->
+            <div class="card">
+                <h2><div class="card-icon">🔧</div>Pentest Tools</h2>
+                <div id="tools-config">
+                    <p>Tool configurations and custom commands can be managed here.</p>
+                </div>
+                <button class="btn" onclick="loadToolsConfig()">⚙️ Configure Tools</button>
+            </div>
+            
+            <!-- Recent Results -->
+            <div class="card">
+                <h2><div class="card-icon">📋</div>Recent Results</h2>
+                <div id="results-list" class="results-list">
+                    <!-- Results will be loaded here -->
+                </div>
+                <button class="btn" onclick="loadResults()">🔄 Refresh Results</button>
+            </div>
+            
+            <!-- Configuration -->
+            <div class="card">
+                <h2><div class="card-icon">⚙️</div>Configuration</h2>
+                <div class="form-group">
+                    <label>Web UI Port:</label>
+                    <input type="number" id="web-port" value="8080" min="1024" max="65535">
+                </div>
+                <div class="form-group">
+                    <label>Log Level:</label>
+                    <select id="log-level">
+                        <option value="DEBUG">DEBUG</option>
+                        <option value="INFO">INFO</option>
+                        <option value="WARNING">WARNING</option>
+                        <option value="ERROR">ERROR</option>
+                    </select>
+                </div>
+                <button class="btn btn-success" onclick="saveSystemConfig()">💾 Save Settings</button>
+                <button class="btn" onclick="exportConfig()">📤 Export Config</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentConfig = {};
+        
+        // Load initial data
+        document.addEventListener('DOMContentLoaded', function() {
+            loadConfig();
+            loadSystemInfo();
+            loadResults();
+        });
+        
+        // Load configuration
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/config');
+                currentConfig = await response.json();
+                
+                // Populate form fields
+                document.getElementById('ai-api-key').value = currentConfig.ai_assistant?.api_key || '';
+                document.getElementById('ai-model').value = currentConfig.ai_assistant?.model || 'gpt-3.5-turbo';
+                document.getElementById('ai-max-tokens').value = currentConfig.ai_assistant?.max_tokens || 500;
+                document.getElementById('web-port').value = currentConfig.system?.web_ui_port || 8080;
+                document.getElementById('log-level').value = currentConfig.system?.log_level || 'INFO';
+                
+                showAlert('Configuration loaded successfully', 'success');
+            } catch (error) {
+                showAlert('Failed to load configuration: ' + error.message, 'error');
+            }
+        }
+        
+        // Load system information
+        async function loadSystemInfo() {
+            try {
+                const response = await fetch('/api/system/info');
+                const systemInfo = await response.json();
+                
+                const systemInfoDiv = document.getElementById('system-info');
+                systemInfoDiv.innerHTML = '';
+                
+                for (const [key, value] of Object.entries(systemInfo)) {
+                    const infoItem = document.createElement('div');
+                    infoItem.innerHTML = `<strong>${key}:</strong> ${value}`;
+                    systemInfoDiv.appendChild(infoItem);
+                }
+                
+                // Update status
+                const statusDiv = document.querySelector('#system-status .status');
+                statusDiv.textContent = 'System Online';
+                statusDiv.className = 'status status-connected';
+                
+            } catch (error) {
+                console.error('Failed to load system info:', error);
+            }
+        }
+        
+        // Scan WiFi networks
+        async function scanWiFi() {
+            try {
+                showAlert('Scanning for networks...', 'success');
+                const response = await fetch('/api/wifi/scan');
+                const networks = await response.json();
+                
+                const networksDiv = document.getElementById('wifi-networks');
+                networksDiv.innerHTML = '';
+                
+                networks.forEach(network => {
+                    const networkDiv = document.createElement('div');
+                    networkDiv.className = 'network-item';
+                    
+                    const signalClass = getSignalClass(network.signal);
+                    const lockIcon = network.encrypted ? '🔒' : '🔓';
+                    
+                    networkDiv.innerHTML = `
+                        <div>
+                            <strong>${lockIcon} ${network.ssid}</strong>
+                        </div>
+                        <div>
+                            <span class="signal-strength ${signalClass}">${network.signal} dBm</span>
+                            <button class="btn" onclick="connectToNetwork('${network.ssid}', ${network.encrypted})" style="margin-left: 0.5rem;">Connect</button>
+                        </div>
+                    `;
+                    
+                    networksDiv.appendChild(networkDiv);
+                });
+                
+            } catch (error) {
+                showAlert('Failed to scan networks: ' + error.message, 'error');
+            }
+        }
+        
+        // Get signal strength class
+        function getSignalClass(signal) {
+            if (signal > -50) return 'signal-excellent';
+            if (signal > -70) return 'signal-good';
+            return 'signal-poor';
+        }
+        
+        // Connect to network
+        async function connectToNetwork(ssid, encrypted) {
+            let password = '';
+            
+            if (encrypted) {
+                password = prompt(`Enter password for ${ssid}:`);
+                if (!password) return;
+            }
+            
+            try {
+                const response = await fetch('/api/wifi/connect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ssid, password })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert(`Connected to ${ssid}`, 'success');
+                } else {
+                    showAlert(`Failed to connect to ${ssid}: ${result.error}`, 'error');
+                }
+                
+            } catch (error) {
+                showAlert('Connection failed: ' + error.message, 'error');
+            }
+        }
+        
+        // Show add network form
+        function showAddNetworkForm() {
+            document.getElementById('add-network-form').style.display = 'block';
+        }
+        
+        // Hide add network form
+        function hideAddNetworkForm() {
+            document.getElementById('add-network-form').style.display = 'none';
+            document.getElementById('new-ssid').value = '';
+            document.getElementById('new-password').value = '';
+        }
+        
+        // Add network
+        async function addNetwork() {
+            const ssid = document.getElementById('new-ssid').value.trim();
+            const password = document.getElementById('new-password').value;
+            
+            if (!ssid) {
+                showAlert('Please enter network SSID', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/wifi/connect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ssid, password })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert(`Network ${ssid} added successfully`, 'success');
+                    hideAddNetworkForm();
+                } else {
+                    showAlert(`Failed to add network: ${result.error}`, 'error');
+                }
+                
+            } catch (error) {
+                showAlert('Failed to add network: ' + error.message, 'error');
+            }
+        }
+        
+        // Save AI configuration
+        async function saveAIConfig() {
+            const aiConfig = {
+                ai_assistant: {
+                    api_key: document.getElementById('ai-api-key').value,
+                    model: document.getElementById('ai-model').value,
+                    max_tokens: parseInt(document.getElementById('ai-max-tokens').value),
+                    temperature: 0.7,
+                    provider: 'openai'
+                }
+            };
+            
+            try {
+                const response = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(aiConfig)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('AI configuration saved successfully', 'success');
+                } else {
+                    showAlert('Failed to save AI configuration', 'error');
+                }
+                
+            } catch (error) {
+                showAlert('Failed to save AI configuration: ' + error.message, 'error');
+            }
+        }
+        
+        // Save system configuration
+        async function saveSystemConfig() {
+            const systemConfig = {
+                system: {
+                    web_ui_port: parseInt(document.getElementById('web-port').value),
+                    log_level: document.getElementById('log-level').value,
+                    auto_save_results: true
+                }
+            };
+            
+            try {
+                const response = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(systemConfig)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('System configuration saved successfully', 'success');
+                } else {
+                    showAlert('Failed to save system configuration', 'error');
+                }
+                
+            } catch (error) {
+                showAlert('Failed to save system configuration: ' + error.message, 'error');
+            }
+        }
+        
+        // Load results
+        async function loadResults() {
+            try {
+                const response = await fetch('/api/results');
+                const results = await response.json();
+                
+                const resultsDiv = document.getElementById('results-list');
+                resultsDiv.innerHTML = '';
+                
+                if (results.length === 0) {
+                    resultsDiv.innerHTML = '<p>No results found</p>';
+                    return;
+                }
+                
+                results.forEach(result => {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'result-item';
+                    resultDiv.innerHTML = `
+                        <div><strong>${result.filename}</strong></div>
+                        <div>Size: ${formatFileSize(result.size)} | Modified: ${new Date(result.modified * 1000).toLocaleString()}</div>
+                    `;
+                    resultDiv.onclick = () => viewResult(result.filename);
+                    resultsDiv.appendChild(resultDiv);
+                });
+                
+            } catch (error) {
+                showAlert('Failed to load results: ' + error.message, 'error');
+            }
+        }
+        
+        // View result content
+        async function viewResult(filename) {
+            try {
+                const response = await fetch(`/api/results/${filename}`);
+                const result = await response.json();
+                
+                if (result.content) {
+                    // Create modal or new window to display content
+                    const newWindow = window.open('', '_blank', 'width=800,height=600');
+                    newWindow.document.write(`
+                        <html>
+                            <head><title>${filename}</title></head>
+                            <body style="font-family: monospace; padding: 20px; white-space: pre-wrap;">
+                                ${result.content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}
+                            </body>
+                        </html>
+                    `);
+                } else {
+                    showAlert('Failed to load result content', 'error');
+                }
+                
+            } catch (error) {
+                showAlert('Failed to view result: ' + error.message, 'error');
+            }
+        }
+        
+        // Shutdown system
+        async function shutdownSystem() {
+            if (!confirm('Are you sure you want to shutdown the system?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/system/shutdown', {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('System is shutting down...', 'success');
+                } else {
+                    showAlert('Failed to shutdown system', 'error');
+                }
+                
+            } catch (error) {
+                showAlert('Shutdown failed: ' + error.message, 'error');
+            }
+        }
+        
+        // Export configuration
+        function exportConfig() {
+            const dataStr = JSON.stringify(currentConfig, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'pen-deck-config.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showAlert('Configuration exported successfully', 'success');
+        }
+        
+        // Load tools configuration
+        async function loadToolsConfig() {
+            try {
+                const response = await fetch('/api/tools');
+                const tools = await response.json();
+                
+                const toolsDiv = document.getElementById('tools-config');
+                toolsDiv.innerHTML = '<h3>Available Tools:</h3>';
+                
+                for (const [toolName, commands] of Object.entries(tools)) {
+                    const toolDiv = document.createElement('div');
+                    toolDiv.innerHTML = `
+                        <h4>${toolName.toUpperCase()}</h4>
+                        <ul>
+                            ${Object.keys(commands).map(cmd => `<li>${cmd}</li>`).join('')}
+                        </ul>
+                    `;
+                    toolsDiv.appendChild(toolDiv);
+                }
+                
+            } catch (error) {
+                showAlert('Failed to load tools configuration: ' + error.message, 'error');
+            }
+        }
+        
+        // Utility functions
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            document.body.insertBefore(alertDiv, document.body.firstChild);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+        
+        // Auto-refresh system info every 30 seconds
+        setInterval(loadSystemInfo, 30000);
+    </script>
+</body>
+</html>
