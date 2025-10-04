@@ -268,13 +268,22 @@ class ST7735S_Waveshare:
             return False
             
     def cleanup(self):
-        """Cleanup"""
+        """Cleanup display resources"""
         try:
+            if self.initialized:
+                # Turn off display
+                self._write_cmd(0x28)  # Display off
+                time.sleep(0.01)
+                
+                # Turn off backlight
+                GPIO.output(self.bl_pin, GPIO.LOW)
+                
             if self.spi:
                 self.spi.close()
-            # Don't cleanup GPIO here
+                self.logger.info("SPI closed")
+                
         except Exception as e:
-            self.logger.error(f"Cleanup error: {e}")
+            self.logger.error(f"Display cleanup error: {e}")
 
 class DisplayManager:
     def __init__(self):
@@ -399,16 +408,27 @@ class DisplayManager:
             self.logger.error(f"Button setup failed: {e}")
             
     def _button_callback(self, pin):
-        """Button callback"""
+        """Button callback with safety checks"""
         try:
+            # Check if we're still running and have callbacks
+            if not hasattr(self, 'button_callbacks'):
+                return
+                
             current_time = time.time()
             if current_time - self.last_button_time.get(pin, 0) < self.debounce_time:
                 return
                 
             self.last_button_time[pin] = current_time
             
-            if pin in self.button_callbacks:
-                self.button_callbacks[pin]()
+            # Check if callback exists and is callable
+            if pin in self.button_callbacks and callable(self.button_callbacks[pin]):
+                try:
+                    self.button_callbacks[pin]()
+                except Exception as e:
+                    self.logger.error(f"Callback error for pin {pin}: {e}")
+            else:
+                self.logger.debug(f"No callback for pin {pin}")
+                
         except Exception as e:
             self.logger.error(f"Button callback error: {e}")
             
@@ -519,13 +539,45 @@ class DisplayManager:
             self.logger.error(f"System info error: {e}")
             
     def cleanup(self):
-        """Cleanup"""
+        """Cleanup all resources safely"""
         try:
-            if self.st7735s:
-                self.st7735s.cleanup()
+            self.logger.info("Starting DisplayManager cleanup...")
+            
+            # Step 1: Clear all button callbacks FIRST to prevent new callbacks
+            self.button_callbacks.clear()
+            self.logger.debug("Cleared button callbacks")
+            
+            # Step 2: Remove all GPIO event detection
             if GPIO_AVAILABLE:
                 pins = [self.PIN_UP, self.PIN_DOWN, self.PIN_LEFT, self.PIN_RIGHT,
                        self.PIN_CENTER, self.PIN_KEY1, self.PIN_KEY2, self.PIN_KEY3]
-                GPIO.cleanup(pins)
+                
+                for pin in pins:
+                    try:
+                        GPIO.remove_event_detect(pin)
+                        self.logger.debug(f"Removed event detection for pin {pin}")
+                    except Exception as e:
+                        self.logger.debug(f"Could not remove event for pin {pin}: {e}")
+                
+                # Wait for any pending callbacks to complete
+                time.sleep(0.2)
+                self.logger.debug("Waited for pending callbacks")
+                
+                # Step 3: Now cleanup GPIO pins
+                try:
+                    GPIO.cleanup(pins)
+                    self.logger.info("GPIO pins cleaned up")
+                except Exception as e:
+                    self.logger.warning(f"GPIO cleanup warning: {e}")
+            
+            # Step 4: Cleanup display
+            if self.st7735s:
+                self.st7735s.cleanup()
+                self.logger.info("Display cleaned up")
+            
+            self.logger.info("DisplayManager cleanup complete")
+            
         except Exception as e:
             self.logger.error(f"Cleanup error: {e}")
+            import traceback
+            self.logger.error(traceback.format_exc())
